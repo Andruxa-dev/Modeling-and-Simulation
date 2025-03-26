@@ -1,0 +1,40 @@
+#import random
+
+# Allow manual inputs for key variables
+manual_inputs = {
+    "Time_Spent": float(input("Enter estimated Time Spent (hrs): ") or 0),
+    "Energy_Level": float(input("Enter estimated Energy Level (0-2): ") or 0),
+    "Interruptions": int(input("Enter estimated Interruptions: ") or 0),
+    "Focus_Level": float(input("Enter estimated Focus Level (0-1.5): ") or 0),
+    "Time_of_Day": int(input("Enter estimated Time of Day (1-8): ") or 0)
+}
+
+# Generate next-day data with manual inputs
+next_day_data = []
+task_types = ["Coding", "Break", "Emails", "Meetings", "Admin"]
+
+for task in task_types:
+    row = {feature: 0 for feature in X.columns}  # Ensure correct feature set
+    
+    # Fill in manual input values
+    row.update(manual_inputs)
+    
+    # Activate the current task
+    if f"Task_{task}" in row:
+        row[f"Task_{task}"] = 1
+    
+    next_day_data.append(row)
+
+# Convert to DataFrame and ensure correct feature order
+next_day_df = pd.DataFrame(next_day_data)
+next_day_df = next_day_df[X.columns]  # Ensure the correct column order
+
+y_next_day_pred = model.predict(next_day_df)
+
+# Add the predicted productivity to the DataFrame
+next_day_df["Task"] = task_types
+next_day_df["Predicted_Productivity"] = y_next_day_pred
+
+# Display the full DataFrame including all input variables
+print("\nPredicted Productivity for Next Day:\n")
+print(next_day_df.to_string(index=False))
